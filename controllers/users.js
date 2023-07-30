@@ -1,21 +1,28 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const ValidationError = require('../errors/ValidationError');
+const UnavailableEmailError = require('../errors/UnavailableEmailError');
+const DefaultServerError = require('../errors/DefaultServerError');
+const NotFoundError = require('../errors/NotFoundError');
 const { JWT_KEY = '54bc67bb5cc0f214674313e60dbd0e9707a9e7f3b068bdda5b3050e9a83f4ab4' } = process.env;
 
 module.exports.createUser = (req, res, next) => {
   const { email, password, name } = req.body;
+
   bcrypt.hash(password, 10)
     .then(hash => {
       User.create({ email, password: hash, name })
         .then(user => res.status(201).send({ data: { email: user.email, name: user.name } }))
         .catch(err => {
-          console.log(err); //Error
+          if (err.name === 'ValidationError')
+            next(new ValidationError('Переданы некорректные данные'));
+          else if (err.name === 'MongoServerError' && err.code === 11000)
+            next(new UnavailableEmailError('Данный email уже занят'));
+          else next(new DefaultServerError('На сервере произошла ошибка'));
         });
     })
-    .catch(err => {
-      console.log(err); //Error
-    });
+    .catch(next);
 
 };
 
@@ -23,22 +30,33 @@ module.exports.updateUser = (req, res, next) => {
   const { email, name } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { email, name }, { new: true, runValidators: true })
-    .then(user => res.status(200).send({ data: user }))
+    .then(user => {
+      if (user) res.status(200).send({ data: user });
+      else next(new NotFoundError('Пользователь по данному id не найден'));
+    })
     .catch(err => {
+      if (err.name === 'ValidationError') next(new ValidationError('Переданы некорректные данные'));
+      else next(err);
     });
 };
 
+// !!!!!!!!!!!!!!! TO DELETE !!!!!!!!!!!!!!!!!!!!!
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then(data => res.status(200).send({ data: data }))
-    .catch(err => {
-    });
+    .catch(next);
 };
+// !!!!!!!!!!!!!!! TO DELETE !!!!!!!!!!!!!!!!!!!!!
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
-    .then(user => res.status(200).send(user))
+    .then(user => {
+      if (user) res.status(200).send(user);
+      else throw new NotFoundError('Пользователь по данному id не найден');
+    })
     .catch(err => {
+      if (err.name === 'CastError') next(new ValidationError('Передан невалидный if'));
+      else next(err);
     });
 };
 
