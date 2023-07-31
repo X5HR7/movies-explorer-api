@@ -40,14 +40,6 @@ module.exports.updateUser = (req, res, next) => {
     });
 };
 
-// !!!!!!!!!!!!!!! TO DELETE !!!!!!!!!!!!!!!!!!!!!
-module.exports.getUsers = (req, res, next) => {
-  User.find({})
-    .then(data => res.status(200).send({ data: data }))
-    .catch(next);
-};
-// !!!!!!!!!!!!!!! TO DELETE !!!!!!!!!!!!!!!!!!!!!
-
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then(user => {
