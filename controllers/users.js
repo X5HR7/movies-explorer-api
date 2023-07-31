@@ -43,7 +43,7 @@ module.exports.updateUser = (req, res, next) => {
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then(user => {
-      if (user) res.status(200).send(user);
+      if (user) res.status(200).send({ data: { email: user.email, name: user.name } });
       else throw new NotFoundError('Пользователь по данному id не найден');
     })
     .catch(err => {
