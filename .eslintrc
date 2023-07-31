@@ -24,7 +24,7 @@
     "comma-dangle": "off",
     "no-useless-escape": "off",
     "nonblock-statement-body-position": "off",
-    "no-unused-vars": "warn",
+    "no-unused-vars": "off",
     "curly": "off",
     "import/newline-after-import": "off",
     "no-shadow": "off",
@@ -38,6 +38,9 @@
     ],
     "implicit-arrow-linebreak": "off",
     "function-paren-newline": "off",
-    "import/order": "off"
+    "import/order": "off",
+    "func-names": "off",
+    "object-shorthand": "off",
+    "padded-blocks": "off"
   }
 }

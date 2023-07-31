@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const { getUsers, getUser, updateUser } = require('../controllers/users');
 
-router.get('/', getUsers); //DELETE !!!!!!!!!!!!
+router.get('/', getUsers);
 
 router.get('/me', getUser);
 router.patch('/me', celebrate({
