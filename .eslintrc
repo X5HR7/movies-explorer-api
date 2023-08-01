@@ -41,6 +41,7 @@
     "import/order": "off",
     "func-names": "off",
     "object-shorthand": "off",
-    "padded-blocks": "off"
+    "padded-blocks": "off",
+    "newline-per-chained-call": "off"
   }
 }
