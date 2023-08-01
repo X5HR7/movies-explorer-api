@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const { celebrate, Joi, errors } = require('celebrate');
 const router = require('./routes/index');
-const auth = require('./middlewares/auth');
-const { login, createUser, logout } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const NotFoundError = require('./errors/NotFoundError');
+const errorMessages = require('./utils/errorMessages');
+const { errors } = require('celebrate');
 
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 
@@ -28,23 +28,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(requestLogger);
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().required()
-  })
-}), login);
+app.use('/', router);
 
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-    name: Joi.string().min(2).max(30).required()
-  })
-}), createUser);
-
-app.post('/signout', logout);
-app.use('/', auth, router);
+app.use((req, res, next) => {
+  next(new NotFoundError(errorMessages.notFoundError));
+});
 
 app.use(errorLogger);
 
