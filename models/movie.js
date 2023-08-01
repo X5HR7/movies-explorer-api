@@ -33,11 +33,23 @@ const movieSchema = mongoose.Schema({
   },
   trailerLink: {
     type: String,
-    required: true
+    required: true,
+    validate: {
+      validator(v) {
+        const regex = /^((http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-Za-zА-Яа-я0-9\-]*\.?)*\.{1}[A-Za-zА-Яа-я0-9-]{2,8}(\/([\w#!:.?+=&%@!\-\/])*)?/;
+        return regex.test(v);
+      }
+    }
   },
   thumbnail: {
     type: String,
-    required: true
+    required: true,
+    validate: {
+      validator(v) {
+        const regex = /^((http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-Za-zА-Яа-я0-9\-]*\.?)*\.{1}[A-Za-zА-Яа-я0-9-]{2,8}(\/([\w#!:.?+=&%@!\-\/])*)?/;
+        return regex.test(v);
+      }
+    }
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
