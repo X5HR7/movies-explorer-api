@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
+const limiter = require('./middlewares/limiter');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -22,6 +23,7 @@ mongoose.connect(DB_URL, {
 
 const app = express();
 
+app.use(limiter);
 app.use(helmet());
 app.use(cookieParser());
 
@@ -38,9 +40,7 @@ app.use((req, res, next) => {
 });
 
 app.use(errorLogger);
-
 app.use(errors());
-
 app.use(errorHandler);
 
 app.listen(PORT, () => {
