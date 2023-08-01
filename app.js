@@ -9,6 +9,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./errors/NotFoundError');
 const errorMessages = require('./utils/errorMessages');
 const { errors } = require('celebrate');
+const errorHandler = require('./utils/errorHandler');
 
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 
@@ -38,10 +39,7 @@ app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  if (err && err.statusCode) res.status(err.statusCode).send({ message: err.message });
-  else res.status(500).send({ message: 'На сервере произошла ошибка' });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
