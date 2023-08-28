@@ -11,20 +11,19 @@ const { JWT_KEY = '54bc67bb5cc0f214674313e60dbd0e9707a9e7f3b068bdda5b3050e9a83f4
 module.exports.createUser = (req, res, next) => {
   const { email, password, name } = req.body;
 
-  bcrypt.hash(password, 10)
+  bcrypt
+    .hash(password, 10)
     .then(hash => {
       User.create({ email, password: hash, name })
         .then(user => res.status(201).send({ data: { email: user.email, name: user.name } }))
         .catch(err => {
-          if (err.name === 'ValidationError')
-            next(new ValidationError(errorMessages.validationError));
+          if (err.name === 'ValidationError') next(new ValidationError(errorMessages.validationError));
           else if (err.name === 'MongoServerError' && err.code === 11000)
             next(new UnavailableEmailError(errorMessages.unavailableEmailError));
           else next(new DefaultServerError(errorMessages.defaultServerError));
         });
     })
     .catch(next);
-
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -37,6 +36,8 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch(err => {
       if (err.name === 'ValidationError') next(new ValidationError(errorMessages.validationError));
+      else if (err.name === 'MongoServerError' && err.code === 11000)
+        next(new UnavailableEmailError(errorMessages.unavailableEmailError));
       else next(err);
     });
 };
@@ -72,8 +73,5 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.logout = (req, res, next) => {
-  res
-    .status(200)
-    .cookie('jwt', '')
-    .send({ message: 'Logged out' });
+  res.status(200).cookie('jwt', '').send({ message: 'Logged out' });
 };
